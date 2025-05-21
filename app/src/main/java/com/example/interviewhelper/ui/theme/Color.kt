@@ -9,3 +9,36 @@ val Pink80 = Color(0xFFEFB8C8)
 val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
+
+// 蓝绿色清新风
+val Teal80 = Color(0xFFB2DFDB)
+val LightBlue80 = Color(0xFFB3E5FC)
+val Aqua80 = Color(0xFFA7FFEB)
+val Teal40 = Color(0xFF00796B)
+val LightBlue40 = Color(0xFF4DB2E8)
+val Aqua40 = Color(0xFF00BFA5)
+
+// 紫灰科技风
+val SpacePurple80 = Color(0xFFD1C4E9)
+val CloudGrey80 = Color(0xFFE0E0E0)
+val CosmicBlue80 = Color(0xFFBBDEFB)
+val SpacePurple40 = Color(0xFF512DA8)
+val CloudGrey40 = Color(0xFF757575)
+val CosmicBlue40 = Color(0xFF1976D2)
+
+// 骚粉温柔风
+val Peach80 = Color(0xFFFFD1DC)
+val Blossom80 = Color(0xFFFFC1E3)
+val Rose80 = Color(0xFFFFB3C6)
+val Peach40 = Color(0xFFEC407A)
+val Blossom40 = Color(0xFFD81B60)
+val Rose40 = Color(0xFFC2185B)
+val PurpleRed = Color(0xFFE73094)
+
+// 抹茶治愈系
+val Matcha80 = Color(0xFFDCE775)
+val Mint80 = Color(0xFFB9F6CA)
+val Wasabi80 = Color(0xFFAED581)
+val Matcha40 = Color(0xFF9E9D24)
+val Mint40 = Color(0xFF43A047)
+val Wasabi40 = Color(0xFF689F38)

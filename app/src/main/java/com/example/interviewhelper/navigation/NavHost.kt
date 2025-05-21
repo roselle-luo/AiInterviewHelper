@@ -19,7 +19,7 @@ fun AppNavHost() {
             LoginScreen(navController = navController)
         }
         composable("register") {
-            RegisterScreen()
+            RegisterScreen(navController = navController)
         }
     }
 }
