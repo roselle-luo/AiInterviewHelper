@@ -2,16 +2,26 @@ package com.example.interviewhelper.viewmodel
 
 import android.content.Context
 import android.widget.Toast
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
+import com.example.interviewhelper.common.GlobalData
+import com.example.interviewhelper.data.repository.UserRepository
+import com.example.interviewhelper.utils.LoadingDialogController
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class RegisterViewModel : ViewModel() {
+@HiltViewModel
+class RegisterViewModel @Inject constructor(
+    private val userRepository: UserRepository,
+    private val globalData: GlobalData
+) : ViewModel() {
 
     val email = mutableStateOf("")
-
-    val verifyCode = mutableStateOf("")
 
     val sex = mutableStateOf("")
 
@@ -25,15 +35,37 @@ class RegisterViewModel : ViewModel() {
 
     val subject = mutableStateOf("")
 
-    val sexes =  mutableListOf("男", "女")
+    val sexes = mutableListOf("男", "女")
 
     val ages = (1..100).map { it.toString() }.toMutableList()
 
-    // 登录逻辑
-    fun onLoginClicked(context: Context) {
-        Toast.makeText(context, "发送成功", Toast.LENGTH_SHORT).show()
-        println("尝试登录：用户名=$email, 密码=$verifyCode")
-        // 这里可以调用 Repository 进行登录请求
+    fun onRegister(context: Context, navController: NavController) {
+        LoadingDialogController.show("注册中...")
+        viewModelScope.launch {
+            try {
+                val response = userRepository.register(
+                    email.value,
+                    sex.value,
+                    age.value,
+                    school.value,
+                    subject.value
+                )
+                if (response.code == 200) {
+                    withContext(Dispatchers.IO) {
+                        globalData.saveToken(response.data?.token.toString())
+                        globalData.initData()
+                    }
+                    Toast.makeText(context, "注册成功", Toast.LENGTH_SHORT).show()
+                    navController.navigate("home")
+                } else {
+                    Toast.makeText(context, "注册失败: ${response.message}", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(context, "注册失败: ${e}", Toast.LENGTH_SHORT).show()
+                println(e.toString())
+            } finally {
+                LoadingDialogController.hide()
+            }
+        }
     }
-
 }

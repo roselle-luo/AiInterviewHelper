@@ -20,6 +20,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -28,6 +29,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.interviewhelper.R
@@ -41,7 +43,7 @@ import com.example.interviewhelper.viewmodel.LoginViewModel
 @Preview
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel = LoginViewModel(),
+    viewModel: LoginViewModel = hiltViewModel<LoginViewModel>(),
     navController: NavController = rememberNavController()
 ) {
     val context = LocalContext.current
@@ -90,9 +92,10 @@ fun LoginScreen(
                     cursorColor = Rose40
                 ),
                 trailingIcon = {
-                    TextButton(onClick = { viewModel.onLoginClicked(context) }) {
-                        Text("发送", color = Rose40)
-                    }
+                    if (viewModel.countDownTime.value == 0)
+                        TextButton(onClick = { viewModel.startVerify(context) }) {
+                            Text("发送", color = Rose40)
+                        } else Text(text = "重新发送(${viewModel.countDownTime.intValue}s)", color = Color.Gray)
                 },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -103,7 +106,7 @@ fun LoginScreen(
                 Text("没有账号？去注册go ➢➢➢", color = PurpleRed)
             }
             Button(
-                onClick = { viewModel.onLoginClicked(context) },
+                onClick = { viewModel.onLoginClicked(context, navController) },
                 colors = ButtonDefaults.buttonColors(containerColor = Blossom40),
                 modifier = Modifier
                     .fillMaxWidth()

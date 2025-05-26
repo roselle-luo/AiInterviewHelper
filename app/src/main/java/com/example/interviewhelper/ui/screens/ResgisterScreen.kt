@@ -2,8 +2,6 @@ package com.example.interviewhelper.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowColumn
 import androidx.compose.foundation.layout.Row
@@ -19,9 +17,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -31,12 +27,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.interviewhelper.R
+import com.example.interviewhelper.ui.component.LoadingDialog
 import com.example.interviewhelper.ui.component.SelectFiled
 import com.example.interviewhelper.ui.component.TopBar
-import com.example.interviewhelper.ui.theme.Blossom40
 import com.example.interviewhelper.ui.theme.PurpleRed
 import com.example.interviewhelper.ui.theme.Rose40
 import com.example.interviewhelper.viewmodel.RegisterViewModel
@@ -45,11 +42,13 @@ import com.example.interviewhelper.viewmodel.RegisterViewModel
 @Preview
 @Composable
 fun RegisterScreen(
-    viewModel: RegisterViewModel = RegisterViewModel(),
+    viewModel: RegisterViewModel = hiltViewModel(),
     navController: NavController = rememberNavController()
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
+
+    LoadingDialog()
 
     Scaffold(
         modifier = Modifier.pointerInput(Unit) { detectTapGestures(onTap = { focusManager.clearFocus() }) },
@@ -123,26 +122,8 @@ fun RegisterScreen(
                 ),
             )
             Spacer(modifier = Modifier.height(12.dp))
-            OutlinedTextField(
-                value = viewModel.verifyCode.value,
-                onValueChange = { viewModel.verifyCode.value = it },
-                label = { Text("验证码") },
-                shape = RoundedCornerShape(16.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Rose40,
-                    focusedLabelColor = Rose40,
-                    cursorColor = Rose40
-                ),
-                trailingIcon = {
-                    TextButton(onClick = { viewModel.onLoginClicked(context) }) {
-                        Text("发送", color = Blossom40)
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(12.dp))
             Button(
-                onClick = { viewModel.onLoginClicked(context) },
+                onClick = { viewModel.onRegister(context, navController) },
                 colors = ButtonDefaults.buttonColors(PurpleRed),
                 modifier = Modifier
                     .fillMaxWidth()
