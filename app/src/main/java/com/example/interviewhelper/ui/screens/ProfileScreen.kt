@@ -65,7 +65,6 @@ import com.example.interviewhelper.ui.theme.Peach40
 import com.example.interviewhelper.ui.theme.Peach50
 import com.example.interviewhelper.ui.theme.Peach60
 import com.example.interviewhelper.ui.theme.Peach80
-import com.example.interviewhelper.ui.theme.PurpleRed
 import com.example.interviewhelper.ui.theme.Rose80
 import com.example.interviewhelper.ui.theme.Sun50
 import com.example.interviewhelper.viewmodel.ProfileViewModel
@@ -208,7 +207,7 @@ fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel = hi
                             {},
                             R.drawable.preference,
                             "面试偏好",
-                            backGroundColor = PurpleRed,
+                            backGroundColor = Peach50,
                         )
                         Spacer(Modifier.width(12.dp))
                         RowButtonWithIcon(
