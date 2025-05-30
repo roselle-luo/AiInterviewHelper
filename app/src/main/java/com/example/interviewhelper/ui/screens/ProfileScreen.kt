@@ -1,5 +1,6 @@
 package com.example.interviewhelper.ui.screens // 根据你的包名修改
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -12,6 +13,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,19 +28,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Build
-import androidx.compose.material.icons.filled.Create
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -50,26 +47,41 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.interviewhelper.R
+import com.example.interviewhelper.ui.component.RowButtonWithIcon
+import com.example.interviewhelper.ui.theme.LightBlue40
 import com.example.interviewhelper.ui.theme.Peach40
+import com.example.interviewhelper.ui.theme.Peach50
+import com.example.interviewhelper.ui.theme.Peach60
+import com.example.interviewhelper.ui.theme.Peach80
+import com.example.interviewhelper.ui.theme.PurpleRed
+import com.example.interviewhelper.ui.theme.Rose80
+import com.example.interviewhelper.ui.theme.Sun50
 import com.example.interviewhelper.viewmodel.ProfileViewModel
 
 
-data class MenuListItem(val icon: ImageVector, val text: String)
+data class MenuListItem(
+    val icon: ImageVector,
+    val text: String,
+    val color: Color = Color.Unspecified
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel = hiltViewModel()) {
     val user by viewModel.userInfo.collectAsState()
-
+    val context = LocalContext.current
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -100,14 +112,19 @@ fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel = hi
                             .wrapContentHeight() // 高度随内容自适应
                             // 将背景渐变应用到 Card 的 Modifier 上
                             .background(
-                                color = Peach40,
+                                brush = Brush.horizontalGradient(
+                                    colors = listOf(
+                                        Peach40, Peach50,
+                                        Peach60, Peach80
+                                    )
+                                ),
                                 shape = RoundedCornerShape(24.dp)
                             ),
                         shape = RoundedCornerShape(24.dp), // 卡片本身的圆角
                         colors = CardDefaults.cardColors(containerColor = Color.Transparent) // 使卡片透明以显示渐变
                     ) {
                         // 顶部用户信息栏
-                        Column (
+                        Column(
                             modifier = Modifier
                                 .padding(16.dp)
                                 .fillMaxWidth(),
@@ -118,7 +135,7 @@ fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel = hi
                             ) {
                                 // 占位符头像 - 你需要确保 R.drawable.ic_profile_placeholder 存在
                                 Image(
-                                    painter = painterResource(id = R.drawable.ic_launcher_background), // 替换为你的头像资源
+                                    painter = painterResource(id = R.drawable.common_avatar), // 替换为你的头像资源
                                     contentDescription = "用户头像",
                                     modifier = Modifier
                                         .size(60.dp)
@@ -158,7 +175,6 @@ fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel = hi
                             }
                         }
 
-                        // 你原来的邮箱和学校信息（如果想放在卡片内）
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -180,64 +196,66 @@ fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel = hi
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // 三个主要功能入口
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 4.dp), // 微调内边距，使其与卡片对齐
-                        horizontalArrangement = Arrangement.SpaceAround // 调整排列方式
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        FeatureButton(
-                            icon = Icons.Filled.Person,
-                            text = "科协成员",
-                            onClick = { /* TODO */ })
-                        Spacer(modifier = Modifier.width(8.dp)) // 增加间距
-                        FeatureButton(
-                            icon = Icons.Filled.Home,
-                            text = "学校官网",
-                            onClick = { /* TODO */ })
-                        Spacer(modifier = Modifier.width(8.dp)) // 增加间距
-                        FeatureButton(
-                            icon = Icons.Filled.Place,
-                            text = "学校地图",
-                            onClick = { /* TODO */ })
+                        RowButtonWithIcon(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f),
+                            {},
+                            R.drawable.preference,
+                            "面试偏好",
+                            backGroundColor = PurpleRed,
+                        )
+                        Spacer(Modifier.width(12.dp))
+                        RowButtonWithIcon(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f),
+                            { Toast.makeText(context, "简历管理", Toast.LENGTH_SHORT).show() },
+                            R.drawable.resume,
+                            "简历管理",
+                            textColor = Color.Black,
+                            MaterialTheme.colorScheme.background,
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // 切换模式按钮
-                    Row(
+                    OutlinedButton(
+                        onClick = {},
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 4.dp), // 微调内边距
-                        horizontalArrangement = Arrangement.SpaceBetween
+                            .background(
+                                brush = Brush.horizontalGradient(
+                                    colors = listOf(
+                                        Color(0xFFFF2D55), // 亮玫红（鲜艳）
+                                        Color(0xFFFF4A8D), // 粉红
+                                        Color(0xFFFFA3B1)  // 浅粉色（亮）
+                                    )
+                                ),
+                                shape = RoundedCornerShape(16.dp)  // 背景圆角必须和按钮形状匹配
+                            ),
+                        shape = RoundedCornerShape(16.dp),
+                        border = BorderStroke(1.dp, color = Rose80),
+                        contentPadding = PaddingValues(16.dp)
                     ) {
-                        OutlinedButton(
-                            onClick = { /* TODO: 处理夜间模式切换 */ },
-                            shape = RoundedCornerShape(8.dp),
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(48.dp), // 确保高度一致
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Filled.Favorite, contentDescription = "夜间模式")
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("夜间模式")
-                            }
-                        }
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Button(
-                            onClick = { /* TODO: 处理主题更换 */ },
-                            shape = RoundedCornerShape(8.dp),
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(48.dp) // 确保高度一致
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Filled.Create, contentDescription = "主题更换")
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("主题更换")
+                        Row {
+                            Text(
+                                "点击接收你的综合分析报告",
+                                letterSpacing = 2.sp,
+                                color = Color.White
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            repeat(3) {
+                                Icon(
+                                    Icons.Default.ArrowForward,
+                                    contentDescription = "点击获取你的专属面经推荐",
+                                    tint = Color.White
+                                )
                             }
                         }
                     }
@@ -247,12 +265,19 @@ fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel = hi
                     // 列表样式的菜单项
                     MenuList(
                         items = listOf(
-                            MenuListItem(Icons.Filled.Add, "签到记录"),
-                            MenuListItem(Icons.Filled.Add, "发帖记录"),
-                            MenuListItem(Icons.Filled.Add, "借阅记录"),
-                            MenuListItem(Icons.Filled.Share, "分享应用"),
-                            MenuListItem(Icons.Filled.Build, "便捷工具"),
-                            MenuListItem(Icons.Filled.Add, "关于应用")
+                            MenuListItem(
+                                ImageVector.vectorResource(R.drawable.history),
+                                "模拟面试记录",
+                                color = Peach40
+                            ),
+                            MenuListItem(
+                                Icons.Default.Star,
+                                "面经收藏",
+                                color = Sun50
+                            ),
+                            MenuListItem(Icons.Filled.Share, "分享应用", color = LightBlue40),
+                            MenuListItem(Icons.Filled.Settings, "设置"),
+                            MenuListItem(Icons.Filled.Info, "关于应用", color = Peach60)
                         )
                     )
 
@@ -269,7 +294,7 @@ fun InfoRow(label: String, value: String, textColor: Color = MaterialTheme.color
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp), // 调整垂直间距
+            .padding(bottom = 4.dp), // 调整垂直间距
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
@@ -282,29 +307,8 @@ fun InfoRow(label: String, value: String, textColor: Color = MaterialTheme.color
         Text(
             text = value,
             style = MaterialTheme.typography.bodyLarge,
-            color = textColor.copy(alpha = 0.9f) // 稍微降低透明度
+            color = textColor.copy(alpha = 0.95f) // 稍微降低透明度
         )
-    }
-}
-
-
-@Composable
-fun FeatureButton(icon: ImageVector, text: String, onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        modifier = Modifier
-            .height(80.dp),
-        shape = RoundedCornerShape(12.dp), // 稍大的圆角
-        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh) // 浅灰色背景
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Icon(icon, contentDescription = text, tint = MaterialTheme.colorScheme.primary)
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
-        }
     }
 }
 
@@ -313,19 +317,17 @@ fun MenuList(items: List<MenuListItem>) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 4.dp) // 与其他元素对齐
-            .clip(RoundedCornerShape(12.dp)) // 整个列表区域的圆角
-            .background(MaterialTheme.colorScheme.surfaceContainerHigh) // 列表背景色
+            .padding(horizontal = 4.dp)
     ) {
         items.forEach { item ->
             MenuItem(item = item)
             // 除了最后一个，都添加 Divider
-            if (items.indexOf(item) < items.size - 1) {
-                Divider(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    color = MaterialTheme.colorScheme.outlineVariant
-                )
-            }
+//            if (items.indexOf(item) < items.size - 1) {
+//                Divider(
+//                    modifier = Modifier.padding(horizontal = 16.dp),
+//                    color = MaterialTheme.colorScheme.outlineVariant
+//                )
+//            }
         }
     }
 }
@@ -336,7 +338,7 @@ fun MenuItem(item: MenuListItem) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = {})
-            .padding(vertical = 12.dp, horizontal = 16.dp), // 调整内边距
+            .padding(vertical = 16.dp), // 调整内边距
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -344,37 +346,15 @@ fun MenuItem(item: MenuListItem) {
             Icon(
                 item.icon,
                 contentDescription = item.text,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                Modifier.size(26.dp),
+                tint = item.color,
             )
             Spacer(modifier = Modifier.width(16.dp))
-            Text(item.text, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(item.text, fontSize = 18.sp)
         }
         Icon(
-            Icons.Filled.Person,
-            contentDescription = "查看更多",
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
+            Icons.Filled.KeyboardArrowRight,
+            contentDescription = "查看详情",
         )
     }
 }
-
-//@Preview(showBackground = true, widthDp = 360, heightDp = 800) // 调整预览大小以更好地查看全貌
-//@Composable
-//fun ProfileScreenPreview() {
-//    // 这是一个模拟的 ViewModel 和 NavController，仅用于预览
-//    class MockProfileViewModel : ProfileViewModel() {
-//        private val _mockUserInfo = MutableStateFlow(
-//            User(
-//                name = "张浩",
-//                department = "软件学部",
-//                id = "2300320225",
-//                email = "zhanghao@example.com",
-//                school = "你的大学名称"
-//            )
-//        )
-//        override val userInfo: StateFlow<User> = _mockUserInfo
-//    }
-//
-//    com.example.yourprojectname.ui.theme.YourAppNameTheme { // 替换为你的主题
-//        ProfileScreen(navController = rememberNavController(), viewModel = MockProfileViewModel())
-//    }
-//}
