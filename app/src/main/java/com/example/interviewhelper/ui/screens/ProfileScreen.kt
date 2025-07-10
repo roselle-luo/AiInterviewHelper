@@ -16,13 +16,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContent
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,14 +48,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
@@ -68,6 +77,7 @@ import com.example.interviewhelper.ui.theme.Peach80
 import com.example.interviewhelper.ui.theme.Rose80
 import com.example.interviewhelper.ui.theme.Sun50
 import com.example.interviewhelper.viewmodel.ProfileViewModel
+import kotlinx.coroutines.delay
 
 
 data class MenuListItem(
@@ -79,14 +89,29 @@ data class MenuListItem(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel = hiltViewModel()) {
+
     val user by viewModel.userInfo.collectAsState()
     val context = LocalContext.current
+    val images = viewModel.imagesList
+    val scope = rememberCoroutineScope()
+    val pagerState = rememberPagerState { images.size }
+
+    // 自动轮播（每 3 秒换一张）
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(3000)
+            val nextPage = (pagerState.currentPage + 1) % images.size
+            pagerState.animateScrollToPage(nextPage)
+        }
+    }
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(WindowInsets.safeDrawing.asPaddingValues())
                 .verticalScroll(rememberScrollState()) // 允许页面滚动
         ) {
             AnimatedVisibility(
@@ -100,7 +125,7 @@ fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel = hi
                 Column(
                     modifier = Modifier
                         .fillMaxWidth() // 填充宽度
-                        .padding(horizontal = 20.dp, vertical = 16.dp), // 调整整体内边距
+                        .padding(horizontal = 20.dp, vertical = 12.dp), // 调整整体内边距
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
@@ -219,6 +244,22 @@ fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel = hi
                             "简历管理",
                             textColor = Color.Black,
                             MaterialTheme.colorScheme.background,
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    HorizontalPager(
+                        state = pagerState,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                    ) { page ->
+                        Image(
+                            painter = painterResource(id = images[page]),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(16.dp))
                         )
                     }
 
