@@ -39,7 +39,6 @@ import com.example.interviewhelper.ui.theme.Rose40
 import com.example.interviewhelper.viewmodel.RegisterViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
-@Preview
 @Composable
 fun RegisterScreen(
     viewModel: RegisterViewModel = hiltViewModel(),

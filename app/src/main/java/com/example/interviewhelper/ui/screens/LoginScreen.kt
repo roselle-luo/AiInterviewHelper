@@ -40,7 +40,6 @@ import com.example.interviewhelper.ui.theme.Rose40
 import com.example.interviewhelper.viewmodel.LoginViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel<LoginViewModel>(),

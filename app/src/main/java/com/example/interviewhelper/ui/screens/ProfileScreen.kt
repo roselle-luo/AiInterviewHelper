@@ -111,7 +111,6 @@ fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel = hi
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(WindowInsets.safeDrawing.asPaddingValues())
                 .verticalScroll(rememberScrollState()) // 允许页面滚动
         ) {
             AnimatedVisibility(
@@ -125,7 +124,8 @@ fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel = hi
                 Column(
                     modifier = Modifier
                         .fillMaxWidth() // 填充宽度
-                        .padding(horizontal = 20.dp, vertical = 12.dp), // 调整整体内边距
+                        .padding(horizontal = 20.dp)
+                        .padding(top = 6.dp), // 调整整体内边距
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
