@@ -23,3 +23,13 @@ class AuthInterceptor @Inject constructor(
     }
 }
 
+class SparkInterceptor @Inject constructor() : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val request = chain.request().newBuilder()
+            .addHeader("Authorization", "Bearer ZTNjODZlOTZjYjI4NDVhZmRiNGVjMmZh")
+            .addHeader("Content-Type", "application/json")
+            .build()
+        return chain.proceed(request)
+    }
+}
+

@@ -51,7 +51,7 @@ fun RelatedArticle(
     navController: NavController, viewModel: ArticleViewModel = hiltViewModel()
 ) {
     val categories = viewModel.categories
-    val articles = viewModel.filteredArticles
+    val articles = viewModel.allArticles
     val searchQuery = viewModel.searchQuery
     val focusManager = LocalFocusManager.current
     val selectedId = viewModel.selectedId

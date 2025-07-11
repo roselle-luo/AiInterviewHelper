@@ -33,6 +33,7 @@ class ChatScreenViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(AiChatUiState()) // 使用AiChatUiState的默认值初始化
     val uiState: StateFlow<AiChatUiState> = _uiState.asStateFlow()
+    val response = mutableStateOf("")
     val soundSwitch = mutableStateOf(false)
 
     // 假设的 AI 回复列表

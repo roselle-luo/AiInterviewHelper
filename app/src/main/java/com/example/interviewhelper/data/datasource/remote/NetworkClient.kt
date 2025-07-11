@@ -7,11 +7,15 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
 object NetworkClient {
-    private val BASE_URL = "https://interview.jzhangluo.com"
+    private const val BASE_URL = "https://interview.jzhangluo.com"
 
-    private val TEST_BASE_URL = "http://10.0.2.2:8000"
+    private const val TEST_BASE_URL = "http://10.0.2.2:8000"
+
+    private const val SPARK_BASE_URL = "https://spark-api-open.xf-yun.com/v1"
 
     private val client = OkHttpClient.Builder().build()
+
+    private val sparkClient = OkHttpClient.Builder().addInterceptor(SparkInterceptor()).build()
 
     val moshi = Moshi.Builder()
         .add(KotlinJsonAdapterFactory())
@@ -25,8 +29,20 @@ object NetworkClient {
             .build()
     }
 
+    private val sparkRetrofit by lazy {
+        Retrofit.Builder()
+            .baseUrl(SPARK_BASE_URL)
+            .client(sparkClient)
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .build()
+    }
+
     val userService: UserApi by lazy {
         retrofit.create(UserApi::class.java)
+    }
+
+    val sparkService: SparkApi by lazy {
+        retrofit.create(SparkApi::class.java)
     }
 
 }
