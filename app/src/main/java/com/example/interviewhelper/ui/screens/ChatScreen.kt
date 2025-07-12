@@ -1,7 +1,6 @@
 package com.example.interviewhelper.ui.screens
 
 import android.widget.Toast
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,7 +18,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -34,7 +32,6 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -57,12 +54,10 @@ import androidx.navigation.NavController
 import com.example.interviewhelper.R
 import com.example.interviewhelper.data.model.ChatMessage
 import com.example.interviewhelper.data.model.MessageRole
-import com.example.interviewhelper.ui.theme.Peach30
 import com.example.interviewhelper.ui.theme.Peach50
 import com.example.interviewhelper.viewmodel.ChatScreenViewModel
-import kotlin.math.max
+import dev.jeziellago.compose.markdowntext.MarkdownText
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(navController: NavController, viewModel: ChatScreenViewModel = hiltViewModel()) {
 
@@ -202,8 +197,8 @@ fun ChatMessageItem(message: ChatMessage, screenWidth: Dp) {
             colors = CardDefaults.cardColors(containerColor = bubbleColor),
             modifier = Modifier.widthIn(max = screenWidth * 0.7f) // 限制气泡最大宽度
         ) {
-            Text(
-                text = message.content,
+            MarkdownText(
+                markdown = message.content,
                 modifier = Modifier.padding(10.dp)
             )
         }

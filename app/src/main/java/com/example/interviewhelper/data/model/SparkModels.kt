@@ -3,16 +3,30 @@ package com.example.interviewhelper.data.model
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-data class ChatRequest(
+data class V2ChatRequest(
     val model: String,
-    val messages: List<Message>,
-    val stream: Boolean
+    val user: String? = null,
+    val messages: List<V2Message>,
+    val stream: Boolean = true,
+    val tools: List<Tool>? = null
 )
 
 @JsonClass(generateAdapter = true)
-data class Message(
+data class V2Message(
     val role: String,
     val content: String
+)
+
+@JsonClass(generateAdapter = true)
+data class Tool(
+    val type: String,
+    val web_search: WebSearch
+)
+
+@JsonClass(generateAdapter = true)
+data class WebSearch(
+    val enable: Boolean,
+    val search_mode: String
 )
 
 @JsonClass(generateAdapter = true)

@@ -42,6 +42,7 @@ android {
 }
 
 dependencies {
+    implementation ("com.github.jeziellago:compose-markdown:0.5.7")
     implementation(libs.converter.moshi)
     implementation(libs.moshi)
     implementation (libs.moshi.kotlin)

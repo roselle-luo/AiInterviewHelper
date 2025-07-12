@@ -11,7 +11,7 @@ object NetworkClient {
 
     private const val TEST_BASE_URL = "http://10.0.2.2:8000"
 
-    private const val SPARK_BASE_URL = "https://spark-api-open.xf-yun.com/v1"
+    private const val SPARK_BASE_URL = "https://spark-api-open.xf-yun.com"
 
     private val client = OkHttpClient.Builder().build()
 
@@ -42,7 +42,7 @@ object NetworkClient {
     }
 
     val sparkService: SparkApi by lazy {
-        retrofit.create(SparkApi::class.java)
+        sparkRetrofit.create(SparkApi::class.java)
     }
 
 }
