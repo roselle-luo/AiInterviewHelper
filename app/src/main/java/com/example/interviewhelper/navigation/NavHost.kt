@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.interviewhelper.common.GlobalData
 import com.example.interviewhelper.ui.component.HomeScreen
+import com.example.interviewhelper.ui.screens.InterviewScreen
 import com.example.interviewhelper.ui.screens.LoginScreen
 import com.example.interviewhelper.ui.screens.RegisterScreen
 
@@ -36,6 +37,9 @@ fun AppNavHost(globalData: GlobalData) {
         }
         composable("home") {
             HomeScreen(rootNavController = navController)
+        }
+        composable("interview") {
+            InterviewScreen(navController = navController)
         }
     }
 }

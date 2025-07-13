@@ -42,6 +42,8 @@ android {
 }
 
 dependencies {
+    implementation ("com.google.accompanist:accompanist-permissions:0.36.0")
+    implementation("androidx.camera:camera-camera2:1.4.2")
     implementation ("com.github.jeziellago:compose-markdown:0.5.7")
     implementation(libs.converter.moshi)
     implementation(libs.moshi)
@@ -49,6 +51,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation("com.google.dagger:hilt-android:2.56.2")
     implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation(libs.androidx.camera.view)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.runtime.livedata)
     ksp("com.google.dagger:hilt-android-compiler:2.56.2")
     implementation("androidx.datastore:datastore-preferences:1.1.7")
     implementation(libs.retrofit)

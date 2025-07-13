@@ -1,280 +1,133 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.example.interviewhelper.ui.screens
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
+import android.Manifest
+import android.app.Activity
+import android.content.pm.PackageManager
+import android.util.Log
+import android.view.SurfaceView
+import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import com.example.interviewhelper.R
-import com.example.interviewhelper.ui.theme.DeeperPurple
-import com.example.interviewhelper.ui.theme.LighterPurple
-import com.example.interviewhelper.ui.theme.Peach40
-import com.example.interviewhelper.viewmodel.InterviewScreenViewModel
+import com.example.interviewhelper.ui.component.CameraPermissionHandler
+import com.example.interviewhelper.ui.component.CircleIconButton
+import com.example.interviewhelper.viewmodel.InterviewController
 
 @Composable
-fun Interview(navController: NavController, viewModel: InterviewScreenViewModel = hiltViewModel()) {
+fun InterviewScreen(
+    navController: NavController, viewModel: InterviewController = hiltViewModel()
+) {
 
-    val gradientTitleColors = listOf(
-        Color(0xFF1E90FF), // Dodger Blue (道奇蓝)
-        Color(0xFF4169E1), // Royal Blue (宝蓝色)
-        Color(0xFF8F00FF), // Electric Purple (电光紫)
-        Color(0xFF8A2BE2),  // 回到蓝紫色
-        Color(0xFF6A11AB), // Indigo (靛蓝色)
-    )
+    val context = LocalContext.current
+    val micSwitch by viewModel.micSwitch
+    val videoSwitch by viewModel.videoSwitch
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val activity = context as? Activity
 
-    val gradientButtonColors = listOf(
-        DeeperPurple,
-        LighterPurple
-    )
-
-    val buttonBrush = Brush.horizontalGradient(gradientButtonColors)
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                brush = Brush.linearGradient(
-                    colors = listOf(
-                        //Color(0xFFBEA8FA), // Royal Blue (宝蓝色)
-                        Color(0xFFC9B8F8), // Royal Blue (宝蓝色)
-                        Color(0xFF2355F1), // Electric Purple (电光紫)
-                    )
-                )
-            )
-    ) {
-
-        BottomSheet(
-            viewModel.bottomSheetSwitch,
-            viewModel.interviewSubject,
-            viewModel.selectedSubject
-        )
-
-        Image(
-            painter = painterResource(id = R.drawable.interview_background),
-            contentDescription = "Background Image", // 提供无障碍描述
-            modifier = Modifier.fillMaxSize(), // 让图片铺满整个Box
-            contentScale = ContentScale.Fit // 裁剪图片以填充边界，可能会裁掉部分内容
-        )
-
+    CameraPermissionHandler(viewModel = viewModel) {
+        // 权限授予后额外操作（可选）
+        Log.d("Permission", "Camera permission granted!")
     }
 
-    Column(
-        modifier = Modifier.fillMaxHeight(),
-        verticalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            "AI模拟面试训练",
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp),
-            fontSize = 28.sp,
-            letterSpacing = 1.5.sp,
-            fontWeight = FontWeight.ExtraBold,
-            style = TextStyle(
-                brush = Brush.linearGradient(
-                    colors = gradientTitleColors
-                )
-            )
-        )
+    LaunchedEffect(Unit) {
+        viewModel.startCamera(lifecycleOwner, context)
+    }
 
-        Column {
+    val previewView by viewModel.previewView.observeAsState()
 
-            Column(
-                modifier = Modifier.padding(horizontal = 16.dp)
+    Box(modifier = Modifier.fillMaxSize()) {
+        // 远端视频（全屏）
+//        AndroidView(
+//            factory = { context ->
+//                SurfaceView(context).apply {
+//                    // 设置远端视频流
+//                    // renderer.setRemoteVideo(this)
+//                }
+//            }, modifier = Modifier.fillMaxSize()
+//        )
+
+        previewView?.let { pv ->
+            // 本地视频（右上角小窗口）
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 56.dp, end = 24.dp)
+                    .size(120.dp, 180.dp)
+                    .background(Color.White, shape = RoundedCornerShape(8.dp)) // 白色背景带圆角
+                    .clip(RoundedCornerShape(8.dp)) // 裁剪圆角
             ) {
-                Text("选择你的面试岗位:", color = Color.White, letterSpacing = 2.sp)
-                Spacer(modifier = Modifier.height(6.dp))
-                Surface(
-                    onClick = { viewModel.bottomSheetSwitch.value = true },
-                    color = Color.Transparent
-                ) {
-                    Row {
-                        Text(
-                            viewModel.selectedSubject.value,
-                            color = Color.White,
-                            letterSpacing = 2.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Icon(
-                            Icons.Filled.Edit,
-                            tint = Peach40,
-                            contentDescription = "选择职位"
-                        )
-                        Text(
-                            "修改",
-                            color = Peach40,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-            }
-
-            Spacer(
-                modifier = Modifier.height(24.dp)
-            )
-
-            Row {
-                Button(
-                    onClick = {},
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(vertical = 16.dp)
-                        .padding(start = 16.dp),
-                    contentPadding = PaddingValues(16.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White, // 按钮本身的颜色设置为透明
-                        contentColor = DeeperPurple// 文本颜色
-                    ),
-                    border = BorderStroke(2.dp, DeeperPurple),
-                    shape = MaterialTheme.shapes.medium, // 形状要和背景的形状一致
-                    content = {
-                        Text(
-                            text = "定制面试间",
-                            fontSize = 16.sp,
-                            letterSpacing = 1.5.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            fontWeight = FontWeight.ExtraBold
-                        )
-                    }
-                )
-
-                Spacer(
-                    modifier = Modifier.width(12.dp)
-                )
-
-                Button(
-                    onClick = {},
-                    modifier = Modifier
-                        .weight(1.5f)
-                        .padding(vertical = 16.dp)
-                        .padding(end = 16.dp)
-                        .background(buttonBrush, shape = MaterialTheme.shapes.medium),
-                    contentPadding = PaddingValues(16.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Transparent, // 按钮本身的颜色设置为透明
-                        contentColor = Color.White // 文本颜色
-                    ),
-                    shape = MaterialTheme.shapes.medium, // 形状要和背景的形状一致
-                    content = {
-                        Text(
-                            text = "开始面试",
-                            fontSize = 16.sp,
-                            letterSpacing = 6.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                        )
-                    }
+                AndroidView(
+                    factory = { pv },
+                    modifier = Modifier.fillMaxSize()
                 )
             }
         }
 
-    }
-}
 
-
-@Composable
-fun BottomSheet(
-    showBottomSheet: MutableState<Boolean>,
-    selectOptions: List<String>,
-    selectedJobs: MutableState<String>
-) {
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = false,
-    )
-
-    if (showBottomSheet.value) {
-        ModalBottomSheet(
-            modifier = Modifier.fillMaxHeight(),
-            sheetState = sheetState,
-            onDismissRequest = { showBottomSheet.value = false }
+        // 底部控制栏
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .padding(bottom = 72.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
-                Text(
-                    "选择岗位",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp),
-                    fontSize = 22.sp,
-                    letterSpacing = 1.5.sp,
-                    fontWeight = FontWeight.ExtraBold,
+            Box (
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.Center  // 让内容居中
+            ) {
+                CircleIconButton(
+                    iconResId = if (micSwitch) R.drawable.micro_open else R.drawable.micro_close,
+                    iconTint = Color.Black,
+                    onClick = { viewModel.micSwitch.value = !viewModel.micSwitch.value },
                 )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Column {
-                    selectOptions.forEach { text ->
-                        Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .height(56.dp)
-                                .selectable(
-                                    selected = (text == selectedJobs.value),
-                                    onClick = {
-                                        selectedJobs.value = text
-                                        showBottomSheet.value = false
-                                    },
-                                    role = Role.RadioButton
-                                )
-                                .padding(horizontal = 16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            RadioButton(
-                                selected = (text == selectedJobs.value),
-                                onClick = {
-                                    selectedJobs.value = text
-                                    showBottomSheet.value = false
-                                }
-                            )
-                            Text(
-                                text = text,
-                                style = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier.padding(start = 16.dp)
-                            )
-                        }
-                    }
-                }
+            }
+            Box (
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.Center  // 让内容居中
+            ) {
+                CircleIconButton(
+                    iconResId = R.drawable.close_phone,
+                    iconTint = Color.Red,
+                    onClick = {
+                        navController.popBackStack()
+                        Toast.makeText(context, "挂断", Toast.LENGTH_SHORT).show()
+                    },
+                )
+            }
+            Box (
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.Center  // 让内容居中
+            ) {
+                CircleIconButton(
+                    iconResId = if (videoSwitch) R.drawable.video_open else R.drawable.video_close,
+                    iconTint = Color.Black,
+                    onClick = {
+                        viewModel.videoSwitch.value = !viewModel.videoSwitch.value
+                    },
+                )
             }
         }
     }

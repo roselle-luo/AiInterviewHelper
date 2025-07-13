@@ -7,7 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class InterviewScreenViewModel @Inject constructor(
+class InterviewEnterScreenViewModel @Inject constructor(
     globalData: GlobalData
 ) : ViewModel() {
 
