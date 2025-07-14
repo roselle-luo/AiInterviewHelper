@@ -42,6 +42,7 @@ android {
 }
 
 dependencies {
+    implementation ("com.airbnb.android:lottie-compose:6.6.6")
     implementation ("com.google.accompanist:accompanist-permissions:0.36.0")
     implementation("androidx.camera:camera-camera2:1.4.2")
     implementation ("com.github.jeziellago:compose-markdown:0.5.7")

@@ -30,6 +30,7 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.interviewhelper.R
 import com.example.interviewhelper.ui.component.CameraPermissionHandler
 import com.example.interviewhelper.ui.component.CircleIconButton
@@ -44,7 +45,7 @@ fun InterviewScreen(
     val micSwitch by viewModel.micSwitch
     val videoSwitch by viewModel.videoSwitch
     val lifecycleOwner = LocalLifecycleOwner.current
-    val activity = context as? Activity
+    val previewView by viewModel.previewView.observeAsState()
 
     CameraPermissionHandler(viewModel = viewModel) {
         // 权限授予后额外操作（可选）
@@ -55,18 +56,16 @@ fun InterviewScreen(
         viewModel.startCamera(lifecycleOwner, context)
     }
 
-    val previewView by viewModel.previewView.observeAsState()
-
     Box(modifier = Modifier.fillMaxSize()) {
         // 远端视频（全屏）
-//        AndroidView(
-//            factory = { context ->
-//                SurfaceView(context).apply {
-//                    // 设置远端视频流
-//                    // renderer.setRemoteVideo(this)
-//                }
-//            }, modifier = Modifier.fillMaxSize()
-//        )
+        AndroidView(
+            factory = { context ->
+                SurfaceView(context).apply {
+                    // 设置远端视频流
+                    // renderer.setRemoteVideo(this)
+                }
+            }, modifier = Modifier.fillMaxSize()
+        )
 
         previewView?.let { pv ->
             // 本地视频（右上角小窗口）
