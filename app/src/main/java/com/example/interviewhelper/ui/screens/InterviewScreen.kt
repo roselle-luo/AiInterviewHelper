@@ -1,8 +1,5 @@
 package com.example.interviewhelper.ui.screens
 
-import android.Manifest
-import android.app.Activity
-import android.content.pm.PackageManager
 import android.util.Log
 import android.view.SurfaceView
 import android.widget.Toast
@@ -25,12 +22,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
-import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.interviewhelper.R
 import com.example.interviewhelper.ui.component.CameraPermissionHandler
 import com.example.interviewhelper.ui.component.CircleIconButton
