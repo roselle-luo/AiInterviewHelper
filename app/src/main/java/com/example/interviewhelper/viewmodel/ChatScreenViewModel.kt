@@ -113,50 +113,11 @@ class ChatScreenViewModel @Inject constructor(
         }
     }
 
-    /**
-     * 根据用户输入随机生成或选择一个 AI 回复
-     */
-//    private fun getRandomAiResponse(userInput: String): String {
-//        // 简单地尝试匹配关键词，如果没有则随机选择
-//        return when {
-//            userInput.contains(
-//                "compose",
-//                ignoreCase = true
-//            ) -> "Jetpack Compose 使得 UI 构建声明式且高效。"
-//
-//            userInput.contains(
-//                "mvvm",
-//                ignoreCase = true
-//            ) -> "MVVM 在您的技术栈中是一个很好的选择，它有助于解耦视图和业务逻辑。"
-//
-//            userInput.contains("retrofit", ignoreCase = true) || userInput.contains(
-//                "okhttp",
-//                ignoreCase = true
-//            ) -> "Retrofit 和 OkHttp 是进行网络请求的强大工具。"
-//
-//            userInput.contains(
-//                "fastapi",
-//                ignoreCase = true
-//            ) -> "FastAPI 因其高性能和易用性而受到 Python 后端开发者的青睐。"
-//
-//            userInput.contains(
-//                "redis",
-//                ignoreCase = true
-//            ) -> "Redis 可以为您的应用提供快速缓存和消息队列功能。"
-//
-//            userInput.contains(
-//                "mariadb",
-//                ignoreCase = true
-//            ) -> "MariaDB 是一个稳定可靠的数据库，非常适合存储应用数据。"
-//
-//            userInput.contains(
-//                "音视频",
-//                ignoreCase = true
-//            ) -> "音视频处理通常需要专业的 SDK 或自建流媒体服务，这会是服务端的一大挑战。"
-//
-//            else -> aiResponses.random()
-//        }
-//    }
+    fun clearMessages() {
+        _uiState.update { current ->
+            current.copy(messages = emptyList())
+        }
+    }
 
     /**
      * 处理错误（例如网络请求失败）

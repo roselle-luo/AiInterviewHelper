@@ -53,6 +53,9 @@ import androidx.navigation.NavController
 import com.example.interviewhelper.R
 import com.example.interviewhelper.data.model.ChatMessage
 import com.example.interviewhelper.data.model.MessageRole
+import com.example.interviewhelper.ui.theme.Aqua40
+import com.example.interviewhelper.ui.theme.Aqua80
+import com.example.interviewhelper.ui.theme.MintBackground
 import com.example.interviewhelper.ui.theme.Peach50
 import com.example.interviewhelper.viewmodel.ChatScreenViewModel
 import dev.jeziellago.compose.markdowntext.MarkdownText
@@ -77,7 +80,7 @@ fun ChatScreen(navController: NavController, viewModel: ChatScreenViewModel = hi
             ) {
                 Text("AI问答", fontWeight = FontWeight.Bold, fontSize = 24.sp)
                 Row {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = { viewModel.clearMessages() }) {
                         Box(
                             modifier = Modifier.size(24.dp)
                         ) {
@@ -161,7 +164,7 @@ fun ChatScreen(navController: NavController, viewModel: ChatScreenViewModel = hi
                                 focus.clearFocus()
                             } else Toast.makeText(context, "输入内容不能为空", Toast.LENGTH_SHORT).show()
                         },
-                        containerColor = MaterialTheme.colorScheme.primary,
+                        containerColor = Aqua40,
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     ) {
                         Icon(Icons.Filled.Send, contentDescription = "发送")
@@ -177,7 +180,7 @@ fun ChatMessageItem(message: ChatMessage, screenWidth: Dp) {
     val isUser = message.role == MessageRole.USER
     if (isUser) Alignment.CenterEnd else Alignment.CenterStart
     val bubbleColor =
-        if (isUser) MaterialTheme.colorScheme.primary else Peach50
+        if (isUser) MaterialTheme.colorScheme.primary else Aqua80
 
     Row(
         modifier = Modifier
