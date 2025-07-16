@@ -157,7 +157,7 @@ fun Interview(navController: NavController, viewModel: InterviewEnterScreenViewM
 
             Row {
                 Button(
-                    onClick = {},
+                    onClick = { viewModel.bottomSheetSwitch.value = true },
                     modifier = Modifier
                         .weight(1f)
                         .padding(vertical = 16.dp)
@@ -171,7 +171,7 @@ fun Interview(navController: NavController, viewModel: InterviewEnterScreenViewM
                     shape = MaterialTheme.shapes.medium, // 形状要和背景的形状一致
                     content = {
                         Text(
-                            text = "定制面试间",
+                            text = "选择岗位",
                             fontSize = 16.sp,
                             letterSpacing = 1.5.sp,
                             maxLines = 1,

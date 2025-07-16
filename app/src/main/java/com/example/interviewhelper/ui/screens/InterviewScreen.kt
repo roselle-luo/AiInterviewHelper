@@ -1,7 +1,10 @@
 package com.example.interviewhelper.ui.screens
 
+import android.R.attr.visible
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -55,16 +58,21 @@ fun InterviewScreen(
     val context = LocalContext.current
     val micSwitch by viewModel.micSwitch
     val videoSwitch by viewModel.videoSwitch
+
     val lifecycleOwner = LocalLifecycleOwner.current
+
     val previewView by viewModel.previewView.observeAsState()
+
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.talk))
-    val listState = rememberLazyListState()
     val progress by animateLottieCompositionAsState(
         composition,
         isPlaying = viewModel.isTalking.value,
         iterations = LottieConstants.IterateForever
     )
     val endProgress = if (!viewModel.isTalking.value) 1f else progress
+
+    val listState = rememberLazyListState()
+
 
     CameraPermissionHandler(viewModel = viewModel) {
         // 权限授予后额外操作（可选）

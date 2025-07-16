@@ -11,6 +11,7 @@ import com.example.interviewhelper.ui.component.HomeScreen
 import com.example.interviewhelper.ui.screens.InterviewScreen
 import com.example.interviewhelper.ui.screens.LoginScreen
 import com.example.interviewhelper.ui.screens.RegisterScreen
+import com.example.interviewhelper.ui.screens.ResumeEditScreen
 
 
 @Composable
@@ -40,6 +41,9 @@ fun AppNavHost(globalData: GlobalData) {
         }
         composable("interview") {
             InterviewScreen(navController = navController)
+        }
+        composable("resume") {
+            ResumeEditScreen(navController= navController)
         }
     }
 }

@@ -239,7 +239,7 @@ fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel = hi
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(1f),
-                            { Toast.makeText(context, "简历管理", Toast.LENGTH_SHORT).show() },
+                            { navController.navigate("resume") },
                             R.drawable.resume,
                             "简历管理",
                             textColor = Color.Black,
