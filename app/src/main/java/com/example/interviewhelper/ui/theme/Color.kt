@@ -12,6 +12,7 @@ val DeeperPurple = Color(0xFFC000C0) // 更深的紫色，从你之前的紫红�
 val LighterPurple = Color(0xFFE0BBE4) // 更浅的紫色，更偏向淡紫罗兰
 
 // 蓝绿色清新风
+val MintBackground = Color(0xFFEFFFFA)
 val Teal80 = Color(0xFFB2DFDB)
 val LightBlue80 = Color(0xFFB3E5FC)
 val Aqua80 = Color(0xFFA7FFEB)

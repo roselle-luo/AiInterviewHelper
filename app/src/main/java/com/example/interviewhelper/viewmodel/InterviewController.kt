@@ -23,8 +23,10 @@ class InterviewController @Inject constructor() : ViewModel() {
 
     private val _previewView = MutableLiveData<PreviewView?>()
     val previewView: LiveData<PreviewView?> = _previewView
-
     private var cameraProvider: ProcessCameraProvider? = null
+
+    val isTalking = mutableStateOf(false)
+    val questions = mutableListOf<String>("请说一下TCP和UDP通信协议的区别和各自的特点", "请讲述一下http和https协议的不同之处", "请详细描述一下安卓的Handler通信机制", "请说一下TCP和UDP通信协议的区别和各自的特点", "请讲述一下http和https协议的不同之处", "请详细描述一下安卓的Handler通信机制")
 
     fun startCamera(lifecycleOwner: LifecycleOwner, context: Context) {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
