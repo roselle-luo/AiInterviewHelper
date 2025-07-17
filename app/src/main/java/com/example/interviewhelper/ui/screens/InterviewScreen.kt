@@ -1,10 +1,8 @@
 package com.example.interviewhelper.ui.screens
 
-import android.R.attr.visible
+import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,12 +42,10 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.interviewhelper.R
 import com.example.interviewhelper.ui.component.CameraPermissionHandler
 import com.example.interviewhelper.ui.component.CircleIconButton
-import com.example.interviewhelper.ui.theme.Blossom80
-import com.example.interviewhelper.ui.theme.LightBlue80
 import com.example.interviewhelper.ui.theme.MintBackground
-import com.example.interviewhelper.ui.theme.Teal80
 import com.example.interviewhelper.viewmodel.InterviewController
 
+@SuppressLint("UnsafeOptInUsageError")
 @Composable
 fun InterviewScreen(
     navController: NavController, viewModel: InterviewController = hiltViewModel()
@@ -172,8 +168,7 @@ fun InterviewScreen(
                     iconResId = R.drawable.close_phone,
                     iconTint = Color.Red,
                     onClick = {
-                        viewModel.isTalking.value = !viewModel.isTalking.value
-                        //navController.popBackStack()
+                        navController.popBackStack()
                         Toast.makeText(context, "挂断", Toast.LENGTH_SHORT).show()
                     },
                 )

@@ -1,39 +1,49 @@
 package com.example.interviewhelper.ui.component
 
+import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.interviewhelper.viewmodel.InterviewController
-import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.shouldShowRationale
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 
+@SuppressLint("MissingPermission")
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun CameraPermissionHandler(
     viewModel: InterviewController,
     onGranted: () -> Unit
 ) {
-    val cameraPermissionState = rememberPermissionState(android.Manifest.permission.CAMERA)
+    val permissionsState = rememberMultiplePermissionsState(
+        permissions = listOf(
+            android.Manifest.permission.CAMERA,
+            android.Manifest.permission.RECORD_AUDIO
+        )
+    )
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        if (cameraPermissionState.status.isGranted) {
-            // 已授权，启动摄像头
+        if (permissionsState.allPermissionsGranted) {
+            // 所有权限已授权，启动摄像头和音频采集
             viewModel.startCamera(lifecycleOwner, context)
+            viewModel.startAudioCapture()
             onGranted()
         } else {
-            // 请求权限
-            cameraPermissionState.launchPermissionRequest()
+            permissionsState.launchMultiplePermissionRequest()
         }
     }
 
-    // 可选 UI 提示（如果权限被拒绝）
-    if (cameraPermissionState.status.shouldShowRationale) {
-        Text("需要相机权限才能进行视频通话")
+    if (permissionsState.shouldShowRationale) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text("应用需要相机和麦克风权限以启用视频通话功能。")
+        }
     }
 }
