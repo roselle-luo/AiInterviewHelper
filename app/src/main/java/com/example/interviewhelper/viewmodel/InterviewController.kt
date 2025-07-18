@@ -1,12 +1,12 @@
 package com.example.interviewhelper.viewmodel
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Context
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresPermission
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
@@ -19,23 +19,32 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.interviewhelper.data.repository.SparkChainRepository
+import com.example.interviewhelper.data.repository.SparkRepository
 import com.example.interviewhelper.data.repository.WebSocketRepository
 import com.example.interviewhelper.utils.H264Encoder
+import com.example.interviewhelper.utils.LoadingDialogController
+import com.example.interviewhelper.utils.toHexString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
 class InterviewController @Inject constructor(
     private val websocket: WebSocketRepository,
-    private val h256Coder: H264Encoder
+    private val sparkRepository: SparkRepository,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    val number: Int = savedStateHandle.get<Int>("number") ?: 10
+    val subject: String = savedStateHandle.get<String>("subject") ?: ""
 
     val micSwitch = mutableStateOf(true)
     val videoSwitch = mutableStateOf(true)
@@ -45,7 +54,9 @@ class InterviewController @Inject constructor(
     private var cameraProvider: ProcessCameraProvider? = null
 
     val isTalking = mutableStateOf(false)
-    val questions = mutableListOf<String>("请说一下TCP和UDP通信协议的区别和各自的特点", "请讲述一下http和https协议的不同之处", "请详细描述一下安卓的Handler通信机制", "请说一下TCP和UDP通信协议的区别和各自的特点", "请讲述一下http和https协议的不同之处", "请详细描述一下安卓的Handler通信机制")
+    val questions = mutableListOf<String>()
+
+    val speechWordsList = mutableListOf<String>()
 
     private var audioRecord: AudioRecord? = null
     private var isRecordingAudio = false
@@ -54,10 +65,33 @@ class InterviewController @Inject constructor(
     val wsMessages = MutableStateFlow("")
 
     init {
-        viewModelScope.launch {
-            websocket.connect().collect { msg ->
-                wsMessages.value = msg
+
+        //SparkChainRepository.initAsr()
+
+        viewModelScope.launch(Dispatchers.IO) {
+            initQuestions(subject = subject, number= number)
+//            SparkChainRepository.wordFlow.collect {
+//                speechWordsList.add(it)
+//            }
+//            websocket.connect().collect { msg ->
+//                wsMessages.value = msg
+//            }
+        }
+    }
+
+
+    suspend fun initQuestions (subject: String, number: Int = 10) {
+        LoadingDialogController.show("面试准备中")
+        try {
+            val response = sparkRepository.getQuestions(subject = subject, number = number)
+            if (response.code == 200) {
+                questions.clear()
+                questions.addAll(response.data?.questions ?: emptyList())
             }
+        } catch (e: Exception) {
+            Log.e("init","questions init failed: $e")
+        } finally {
+            LoadingDialogController.hide()
         }
     }
 
@@ -78,27 +112,14 @@ class InterviewController @Inject constructor(
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
 
-            val debugOutputPath = File(context.getExternalFilesDir(null), "debug_client_${System.currentTimeMillis()}.h264").absolutePath
-            // 初始化编码器
-            val encoderInitialized = h256Coder.initEncoder(
-                width = 1280, // 根据你的需求设置
-                height = 720, // 根据你的需求设置
-                frameRate = 30,
-                bitRate = 2_000_000,
-                debugOutputPath = debugOutputPath // 传入调试文件路径
-            )
-            if (!encoderInitialized) {
-                Log.e("InterviewController", "Failed to initialize H264 video encoder!")
-                return@addListener
-            }
 
             analyzer.setAnalyzer(ContextCompat.getMainExecutor(context)) { imageProxy ->
                 val image = imageProxy.image
                 if (image != null) {
-//                    val h264Frames: List<ByteArray> = h256Coder.encodeImageToH264(image)
-//                    for (frame in h264Frames) {
-//                        websocket.sendVideoData(frame)
-//                    }
+//                    val encoder = H264Encoder()
+//                    val inputSurface = encoder.imageToNV21(image)
+//                    Log.d("nv21", inputSurface.toHexString())
+                    // websocket.sendAudioData(inputSurface)
                 }
                 imageProxy.close()
             }
@@ -161,12 +182,15 @@ class InterviewController @Inject constructor(
 
         audioJob = viewModelScope.launch(Dispatchers.IO) {
             val buffer = ByteArray(bufferSize)
+            var count: Long = 0
             while (isRecordingAudio && audioRecord != null) {
                 val read = audioRecord!!.read(buffer, 0, buffer.size)
                 if (read > 0) {
                     val audioData = buffer.copyOf(read)
-                    websocket.sendAudioData(audioData)
-                    Log.d("WebSocketViewModel", "发送音频数据，长度: ${audioData.size} 字节")
+                    Log.d("AudioSend", "发送音频数据，长度: ${audioData.size} 字节")
+                    // SparkChainRepository.start(audioData, count++)
+                    // websocket.sendAudioData(audioData)
+                    Log.d("AudioSend", "发送音频数据，长度: ${audioData.size} 字节")
                 } else if (read == AudioRecord.ERROR_INVALID_OPERATION || read == AudioRecord.ERROR_BAD_VALUE) {
                     Log.e("WebSocketViewModel", "AudioRecord 读取错误: $read")
                     stopAudioCapture()
@@ -189,5 +213,7 @@ class InterviewController @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         cameraProvider?.unbindAll()
+        stopAudioCapture()
+        SparkChainRepository.clear()
     }
 }

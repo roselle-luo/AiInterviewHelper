@@ -29,6 +29,7 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -42,6 +43,7 @@ android {
 }
 
 dependencies {
+    implementation(files("libs/SparkChain.aar"))
     implementation("com.airbnb.android:lottie-compose:6.6.6")
     implementation("com.google.accompanist:accompanist-permissions:0.36.0")
     implementation("androidx.camera:camera-camera2:1.4.2")

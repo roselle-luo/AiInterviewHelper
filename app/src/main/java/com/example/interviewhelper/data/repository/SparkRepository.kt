@@ -2,7 +2,9 @@ package com.example.interviewhelper.data.repository
 
 import com.example.interviewhelper.data.datasource.remote.NetworkClient.moshi
 import com.example.interviewhelper.data.datasource.remote.NetworkClient.sparkService
+import com.example.interviewhelper.data.model.ApiResponse
 import com.example.interviewhelper.data.model.ChatResponse
+import com.example.interviewhelper.data.model.Question
 import com.example.interviewhelper.data.model.V2ChatRequest
 import com.example.interviewhelper.data.model.V2Message
 import kotlinx.coroutines.Dispatchers
@@ -63,4 +65,9 @@ class SparkRepository @Inject constructor() {
             println("请求异常：${e.message}")
         }
     }.flowOn(Dispatchers.IO) // ✅ 网络请求和IO在IO线程执行
+
+    suspend fun getQuestions(number: Int, subject: String): ApiResponse<Question> {
+        return sparkService.getQuestions(subject = subject, number = number)
+    }
+
 }

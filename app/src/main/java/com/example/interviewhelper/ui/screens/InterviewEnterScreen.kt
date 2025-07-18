@@ -186,7 +186,7 @@ fun Interview(navController: NavController, viewModel: InterviewEnterScreenViewM
                 )
 
                 Button(
-                    onClick = { navController.navigate("interview") },
+                    onClick = { navController.navigate("interview/${viewModel.selectedSubject}/${10}") },
                     modifier = Modifier
                         .weight(1.5f)
                         .padding(vertical = 16.dp)

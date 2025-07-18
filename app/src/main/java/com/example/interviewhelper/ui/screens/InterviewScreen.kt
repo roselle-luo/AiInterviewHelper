@@ -48,7 +48,7 @@ import com.example.interviewhelper.viewmodel.InterviewController
 @SuppressLint("UnsafeOptInUsageError")
 @Composable
 fun InterviewScreen(
-    navController: NavController, viewModel: InterviewController = hiltViewModel()
+    navController: NavController, viewModel: InterviewController
 ) {
 
     val context = LocalContext.current
@@ -112,7 +112,7 @@ fun InterviewScreen(
             ) {
                 items(viewModel.questions.size) { index ->
                     Text(
-                        text = "问题${index}：${viewModel.questions[index]}",
+                        text = "问题${index+1}：${viewModel.questions[index]}",
                         color = Color.Black.copy(alpha = 0.5f),
                         fontSize = 18.sp,
                         maxLines = 7,

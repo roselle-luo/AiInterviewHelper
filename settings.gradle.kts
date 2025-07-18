@@ -8,6 +8,9 @@ pluginManagement {
             }
         }
         mavenCentral()
+        flatDir {
+            dirs("app/libs") // 注意：指向 .aar 所在的目录
+        }
     }
 }
 dependencyResolutionManagement {
@@ -23,3 +26,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "interviewHelper"
 include(":app")
+include(":lib")
