@@ -25,18 +25,18 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-//        val config = SparkChainConfig.builder()
-//            .appID("faae76c6")
-//            .apiKey("018a2c283da3e2d91ef7ee4e5e3a1817")
-//            .apiSecret("ZTNjODZlOTZjYjI4NDVhZmRiNGVjMmZh")
-//        val ret = SparkChain.getInst().init(this, config)
-//        var result: String?
-//        if (ret == 0) {
-//            result = "SDK初始化成功,请选择相应的功能点击体验。"
-//        } else {
-//            result = "SDK初始化失败,错误码:" + ret
-//        }
-//        Log.d("SparkChain", result)
+        val config = SparkChainConfig.builder()
+            .appID("faae76c6")
+            .apiKey("018a2c283da3e2d91ef7ee4e5e3a1817")
+            .apiSecret("ZTNjODZlOTZjYjI4NDVhZmRiNGVjMmZh")
+        val ret = SparkChain.getInst().init(this, config)
+        var result: String?
+        if (ret == 0) {
+            result = "SDK初始化成功,请选择相应的功能点击体验。"
+        } else {
+            result = "SDK初始化失败,错误码:" + ret
+        }
+        Log.d("SparkChain", result)
         setContent {
             InterviewHelperTheme {
                 AppNavHost(globalData = globalData)

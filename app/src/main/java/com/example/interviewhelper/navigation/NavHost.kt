@@ -1,5 +1,6 @@
 package com.example.interviewhelper.navigation
 
+import StatictisScreen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -32,7 +33,7 @@ fun AppNavHost(globalData: GlobalData) {
 
     NavHost(
         navController = navController,
-        startDestination = "home"
+        startDestination = startDestination
     ) {
         composable("login") {
             LoginScreen(navController = navController)
@@ -55,6 +56,9 @@ fun AppNavHost(globalData: GlobalData) {
         }
         composable("resume") {
             ResumeEditScreen(navController= navController)
+        }
+        composable("statictis") {
+            StatictisScreen(navController = navController)
         }
     }
 }

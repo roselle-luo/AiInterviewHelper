@@ -9,7 +9,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 object NetworkClient {
     private const val BASE_URL = "https://interview.jzhangluo.com"
 
-    private const val TEST_BASE_URL = "http://10.0.2.2:8000"
+    private const val TEST_BASE_URL = "http://192.168.89.106:8000"
 
     private const val SPARK_BASE_URL = "https://spark-api-open.xf-yun.com"
 
