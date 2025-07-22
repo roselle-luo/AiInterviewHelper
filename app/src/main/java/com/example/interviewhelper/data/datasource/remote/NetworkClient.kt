@@ -45,4 +45,8 @@ object NetworkClient {
         sparkRetrofit.create(SparkApi::class.java)
     }
 
+    val aiService: AiApi by lazy {
+        retrofit.create(AiApi::class.java)
+    }
+
 }

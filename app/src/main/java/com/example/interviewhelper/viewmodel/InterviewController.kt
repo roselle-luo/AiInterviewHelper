@@ -85,6 +85,7 @@ class InterviewController @Inject constructor(
         try {
             val response = sparkRepository.getQuestions(subject = subject, number = number)
             if (response.code == 200) {
+                Log.d("API","数据获取成功")
                 questions.clear()
                 questions.addAll(response.data?.questions ?: emptyList())
             }

@@ -18,10 +18,4 @@ interface SparkApi {
         @Body request: V2ChatRequest
     ): Response<ResponseBody>
 
-    @GET("ai/get_questions")
-    suspend fun getQuestions(
-        @Query("subject") subject: String,
-        @Query("number") number: Int,
-    ): ApiResponse<Question>
-
 }

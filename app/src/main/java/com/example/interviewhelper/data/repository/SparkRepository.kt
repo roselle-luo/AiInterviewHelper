@@ -1,5 +1,6 @@
 package com.example.interviewhelper.data.repository
 
+import com.example.interviewhelper.data.datasource.remote.NetworkClient.aiService
 import com.example.interviewhelper.data.datasource.remote.NetworkClient.moshi
 import com.example.interviewhelper.data.datasource.remote.NetworkClient.sparkService
 import com.example.interviewhelper.data.model.ApiResponse
@@ -67,7 +68,7 @@ class SparkRepository @Inject constructor() {
     }.flowOn(Dispatchers.IO) // ✅ 网络请求和IO在IO线程执行
 
     suspend fun getQuestions(number: Int, subject: String): ApiResponse<Question> {
-        return sparkService.getQuestions(subject = subject, number = number)
+        return aiService.getQuestions(subject = subject, number = number)
     }
 
 }
