@@ -32,10 +32,6 @@ object SparkTTSRepository {
             val ced: String? = result?.ced //进度
             val sid: String? = result?.sid //sid
 
-            Log.d("Spark", "开始启动2")
-
-            Log.d("Spark", audio?.toHexString() ?: "audio为空")
-
             audio?.let {
                 audioBuffer.write(audio, 0, len)
                 Log.d("Spark", audio.toHexString())
@@ -46,6 +42,7 @@ object SparkTTSRepository {
                 val newAudio = audioBuffer.toByteArray()
                 audioBuffer.reset()
                 // 更新 Flow
+                Log.d("Spark", "一句话结束：$newAudio")
                 wordFlow.value = newAudio
             }
         }

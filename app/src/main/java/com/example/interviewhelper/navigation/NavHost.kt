@@ -34,7 +34,7 @@ fun AppNavHost(globalData: GlobalData) {
 
     NavHost(
         navController = navController,
-        startDestination = "home"
+        startDestination = startDestination
     ) {
         composable("login") {
             LoginScreen(navController = navController)

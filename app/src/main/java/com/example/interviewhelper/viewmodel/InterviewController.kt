@@ -16,6 +16,7 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
@@ -34,6 +35,10 @@ import com.example.interviewhelper.utils.toHexString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -49,7 +54,7 @@ class InterviewController @Inject constructor(
     val number: Int = savedStateHandle.get<Int>("number") ?: 10
     val subject: String = savedStateHandle.get<String>("subject") ?: ""
 
-    val micSwitch = mutableStateOf(true)
+    val micSwitch = mutableStateOf(false)
     val videoSwitch = mutableStateOf(true)
 
     private val _previewView = MutableLiveData<PreviewView?>()
@@ -57,7 +62,8 @@ class InterviewController @Inject constructor(
     private var cameraProvider: ProcessCameraProvider? = null
 
     val isTalking = mutableStateOf(false)
-    val questions = mutableListOf<String>()
+    val questions =
+        mutableStateListOf<String>("你好，我们现在开始我们的面试请你进行一个简要的自我介绍")
 
     val speechWordsList = mutableListOf<ByteArray>()
 
@@ -67,15 +73,36 @@ class InterviewController @Inject constructor(
 
     val wsMessages = MutableStateFlow("")
 
+    private var timerJob: Job? = null
+
+    fun startPeriodicSpeech() {
+        // 如果已有任务，先取消
+        timerJob?.cancel()
+
+        timerJob = viewModelScope.launch {
+            var index = 1
+            while (index < questions.size) {
+                isTalking.value = true
+                playWord(speechWordsList[index])
+                index++
+                delay(60 * 1000L) // 每分钟（单位毫秒）
+            }
+        }
+    }
+
+    fun stopPeriodicSpeech() {
+        timerJob?.cancel()
+        timerJob = null
+    }
+
+
     init {
 
         //SparkChainRepository.initAsr()
-
+        var count = 0
         viewModelScope.launch {
-//            initQuestions(subject = subject, number= number)
-//            SparkChainRepository.wordFlow.collect {
-//                speechWordsList.add(it)
-//            }
+            LoadingDialogController.show("面试准备中")
+            initQuestions(subject = subject, number = number)
 //            websocket.connect().collect { msg ->
 //                wsMessages.value = msg
 //            }
@@ -83,35 +110,44 @@ class InterviewController @Inject constructor(
             launch {
                 SparkTTSRepository.wordFlow.collect {
                     speechWordsList.add(it)
+                    if (count < questions.size) {
+                        sendQuestions(question = questions[count])
+                        count++
+                    } else {
+                        LoadingDialogController.hide()
+                        Log.d("Spark", speechWordsList.size.toString())
+                        delay(1100L)
+                        startPeriodicSpeech()
+                    }
+
                 }
             }
-            sendQuestions(listOf("请详细解释浏览器的渲染流程，从输入 URL 到页面展示的全过程","说说你对事件循环（Event Loop）的理解，以及微任务与宏任务的执行顺序。","如何优化一个大型单页应用（SPA）的首屏加载速度？请列出常见方法并说明原理。","你如何处理 React 中的性能瓶颈问题？请结合具体案例分析。","解释跨域的几种解决方案及其适用场景，包括 CORS、JSONP 和代理转发等."))
+            sendQuestions(questions[count])
+            count++
         }
     }
 
-    suspend fun sendQuestions(question: List<String>) {
-        questions.forEach {
-            SparkTTSRepository.start(it)
+    fun sendQuestions(question: String) =
+        question.forEach {
+            SparkTTSRepository.start(question)
         }
+
+    fun playWord(word: ByteArray) {
+        playAudioAsync(word)
     }
 
-    fun playExample() {
-        playAudioAsync(speechWordsList[1])
-    }
-
-    suspend fun initQuestions (subject: String, number: Int = 10) {
-        // LoadingDialogController.show("面试准备中")
+    suspend fun initQuestions(subject: String, number: Int = 10) {
+        LoadingDialogController.show("面试准备中")
         try {
             val response = sparkRepository.getQuestions(subject = subject, number = number)
             if (response.code == 200) {
-                Log.d("API","数据获取成功")
-                questions.clear()
+                Log.d("init", "数据获取成功")
                 questions.addAll(response.data?.questions ?: emptyList())
             }
         } catch (e: Exception) {
-            Log.e("init","questions init failed: $e")
+            Log.e("init", "questions init failed: $e")
         } finally {
-            //LoadingDialogController.hide()
+            Log.e("init", "init finished")
         }
     }
 
@@ -207,10 +243,10 @@ class InterviewController @Inject constructor(
                 val read = audioRecord!!.read(buffer, 0, buffer.size)
                 if (read > 0) {
                     val audioData = buffer.copyOf(read)
-                    Log.d("AudioSend", "发送音频数据，长度: ${audioData.size} 字节")
+                    //Log.d("AudioSend", "发送音频数据，长度: ${audioData.size} 字节")
                     //SparkChainRepository.start(audioData, count++)
                     // websocket.sendAudioData(audioData)
-                    Log.d("AudioSend", "发送音频数据，长度: ${audioData.size} 字节")
+                    //Log.d("AudioSend", "发送音频数据，长度: ${audioData.size} 字节")
                 } else if (read == AudioRecord.ERROR_INVALID_OPERATION || read == AudioRecord.ERROR_BAD_VALUE) {
                     Log.e("WebSocketViewModel", "AudioRecord 读取错误: $read")
                     stopAudioCapture()
@@ -233,6 +269,7 @@ class InterviewController @Inject constructor(
     fun playAudioAsync(audioData: ByteArray) {
         viewModelScope.launch(Dispatchers.IO) {
             playAudio(audioData)
+            isTalking.value = false
         }
     }
 
@@ -263,6 +300,7 @@ class InterviewController @Inject constructor(
         super.onCleared()
         cameraProvider?.unbindAll()
         stopAudioCapture()
+        stopPeriodicSpeech()
         SparkChainRepository.clear()
     }
 }

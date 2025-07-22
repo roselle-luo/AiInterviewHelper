@@ -2,6 +2,7 @@ package com.example.interviewhelper.ui.screens
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -167,7 +168,6 @@ fun InterviewScreen(
                     iconTint = Color.Black,
                     onClick = {
                         viewModel.micSwitch.value = !viewModel.micSwitch.value
-                        viewModel.playExample()
                     },
                 )
             }
@@ -181,7 +181,7 @@ fun InterviewScreen(
                     onClick = {
                         LoadingDialogController.show("结论正在生成中")
                         coroutineScope.launch {
-                            delay(2000)
+                            delay(5000)
                             LoadingDialogController.hide()
                             navController.popBackStack()
                             navController.navigate("statictis")
