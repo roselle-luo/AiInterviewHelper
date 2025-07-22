@@ -23,7 +23,7 @@ object NetworkClient {
 
     private val retrofit by lazy {
         Retrofit.Builder()
-            .baseUrl(TEST_BASE_URL)
+            .baseUrl(BASE_URL)
             .client(client)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
