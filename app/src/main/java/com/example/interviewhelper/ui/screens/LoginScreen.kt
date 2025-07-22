@@ -33,6 +33,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.interviewhelper.R
+import com.example.interviewhelper.ui.component.LoadingDialog
 import com.example.interviewhelper.ui.component.TopBar
 import com.example.interviewhelper.ui.theme.Blossom40
 import com.example.interviewhelper.ui.theme.PurpleRed
@@ -47,6 +48,9 @@ fun LoginScreen(
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
+
+    LoadingDialog()
+
     Scaffold(
         modifier = Modifier.pointerInput(Unit) { detectTapGestures(onTap = { focusManager.clearFocus() }) },
         topBar = {

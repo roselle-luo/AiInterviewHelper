@@ -2,7 +2,6 @@ package com.example.interviewhelper.ui.screens
 
 import android.annotation.SuppressLint
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,13 +42,17 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.interviewhelper.R
 import com.example.interviewhelper.ui.component.CameraPermissionHandler
 import com.example.interviewhelper.ui.component.CircleIconButton
+import com.example.interviewhelper.ui.component.LoadingDialog
 import com.example.interviewhelper.ui.theme.MintBackground
+import com.example.interviewhelper.utils.LoadingDialogController
 import com.example.interviewhelper.viewmodel.InterviewController
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @SuppressLint("UnsafeOptInUsageError")
 @Composable
 fun InterviewScreen(
-    navController: NavController, viewModel: InterviewController
+    navController: NavController, viewModel: InterviewController = hiltViewModel()
 ) {
 
     val context = LocalContext.current
@@ -68,7 +72,9 @@ fun InterviewScreen(
     val endProgress = if (!viewModel.isTalking.value) 1f else progress
 
     val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
 
+    LoadingDialog()
 
     CameraPermissionHandler(viewModel = viewModel) {
         // 权限授予后额外操作（可选）
@@ -82,9 +88,11 @@ fun InterviewScreen(
         }
     }
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .background(color = MintBackground)) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = MintBackground)
+    ) {
 
         // 动画模拟对话
         Column(
@@ -112,7 +120,7 @@ fun InterviewScreen(
             ) {
                 items(viewModel.questions.size) { index ->
                     Text(
-                        text = "问题${index+1}：${viewModel.questions[index]}",
+                        text = "问题${index + 1}：${viewModel.questions[index]}",
                         color = Color.Black.copy(alpha = 0.5f),
                         fontSize = 18.sp,
                         maxLines = 7,
@@ -150,17 +158,20 @@ fun InterviewScreen(
                 .padding(bottom = 72.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box (
+            Box(
                 modifier = Modifier.weight(1f),
                 contentAlignment = Alignment.Center  // 让内容居中
             ) {
                 CircleIconButton(
                     iconResId = if (micSwitch) R.drawable.micro_open else R.drawable.micro_close,
                     iconTint = Color.Black,
-                    onClick = { viewModel.micSwitch.value = !viewModel.micSwitch.value },
+                    onClick = {
+                        viewModel.micSwitch.value = !viewModel.micSwitch.value
+                        viewModel.playExample()
+                    },
                 )
             }
-            Box (
+            Box(
                 modifier = Modifier.weight(1f),
                 contentAlignment = Alignment.Center  // 让内容居中
             ) {
@@ -168,12 +179,17 @@ fun InterviewScreen(
                     iconResId = R.drawable.close_phone,
                     iconTint = Color.Red,
                     onClick = {
-                        navController.popBackStack()
-                        navController.navigate("statictis")
+                        LoadingDialogController.show("结论正在生成中")
+                        coroutineScope.launch {
+                            delay(2000)
+                            LoadingDialogController.hide()
+                            navController.popBackStack()
+                            navController.navigate("statictis")
+                        }
                     },
                 )
             }
-            Box (
+            Box(
                 modifier = Modifier.weight(1f),
                 contentAlignment = Alignment.Center  // 让内容居中
             ) {

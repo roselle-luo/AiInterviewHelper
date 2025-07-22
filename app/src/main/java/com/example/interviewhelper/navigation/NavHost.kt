@@ -12,6 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.interviewhelper.common.GlobalData
 import com.example.interviewhelper.ui.component.HomeScreen
+import com.example.interviewhelper.ui.screens.ArticleScreen
 import com.example.interviewhelper.ui.screens.InterviewScreen
 import com.example.interviewhelper.ui.screens.LoginScreen
 import com.example.interviewhelper.ui.screens.RegisterScreen
@@ -33,7 +34,7 @@ fun AppNavHost(globalData: GlobalData) {
 
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = "home"
     ) {
         composable("login") {
             LoginScreen(navController = navController)
@@ -59,6 +60,9 @@ fun AppNavHost(globalData: GlobalData) {
         }
         composable("statictis") {
             StatictisScreen(navController = navController)
+        }
+        composable("article") {
+            ArticleScreen(navController = navController)
         }
     }
 }

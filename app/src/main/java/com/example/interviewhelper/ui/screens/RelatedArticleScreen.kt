@@ -116,6 +116,7 @@ fun RelatedArticle(
                         TextImageCard(
                             articles[index].title,
                             articles[index].content,
+                            navController,
                             articles[index].images
                         )
                     }
@@ -130,6 +131,7 @@ fun RelatedArticle(
 fun TextImageCard(
     title: String,
     content: String,
+    navController: NavController,
     @DrawableRes imageRes: List<Int>
 ) {
     Spacer(modifier = Modifier.height(16.dp))
@@ -138,6 +140,7 @@ fun TextImageCard(
             .fillMaxWidth()
             .height(120.dp),
         shape = RoundedCornerShape(12.dp),
+        onClick = { navController.navigate("article") },
         elevation = CardDefaults.cardElevation(6.dp)
     ) {
         Row(

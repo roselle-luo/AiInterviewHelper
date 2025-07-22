@@ -3,7 +3,9 @@ package com.example.interviewhelper.viewmodel
 import android.Manifest
 import android.content.Context
 import android.media.AudioFormat
+import android.media.AudioManager
 import android.media.AudioRecord
+import android.media.AudioTrack
 import android.media.MediaRecorder
 import android.util.Log
 import android.widget.Toast
@@ -24,6 +26,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.interviewhelper.data.repository.SparkChainRepository
 import com.example.interviewhelper.data.repository.SparkRepository
+import com.example.interviewhelper.data.repository.SparkTTSRepository
 import com.example.interviewhelper.data.repository.WebSocketRepository
 import com.example.interviewhelper.utils.H264Encoder
 import com.example.interviewhelper.utils.LoadingDialogController
@@ -56,7 +59,7 @@ class InterviewController @Inject constructor(
     val isTalking = mutableStateOf(false)
     val questions = mutableListOf<String>()
 
-    val speechWordsList = mutableListOf<String>()
+    val speechWordsList = mutableListOf<ByteArray>()
 
     private var audioRecord: AudioRecord? = null
     private var isRecordingAudio = false
@@ -69,19 +72,35 @@ class InterviewController @Inject constructor(
         //SparkChainRepository.initAsr()
 
         viewModelScope.launch {
-            initQuestions(subject = subject, number= number)
+//            initQuestions(subject = subject, number= number)
 //            SparkChainRepository.wordFlow.collect {
 //                speechWordsList.add(it)
 //            }
 //            websocket.connect().collect { msg ->
 //                wsMessages.value = msg
 //            }
+            SparkTTSRepository.init()
+            launch {
+                SparkTTSRepository.wordFlow.collect {
+                    speechWordsList.add(it)
+                }
+            }
+            sendQuestions(listOf("请详细解释浏览器的渲染流程，从输入 URL 到页面展示的全过程","说说你对事件循环（Event Loop）的理解，以及微任务与宏任务的执行顺序。","如何优化一个大型单页应用（SPA）的首屏加载速度？请列出常见方法并说明原理。","你如何处理 React 中的性能瓶颈问题？请结合具体案例分析。","解释跨域的几种解决方案及其适用场景，包括 CORS、JSONP 和代理转发等."))
         }
     }
 
+    suspend fun sendQuestions(question: List<String>) {
+        questions.forEach {
+            SparkTTSRepository.start(it)
+        }
+    }
+
+    fun playExample() {
+        playAudioAsync(speechWordsList[1])
+    }
 
     suspend fun initQuestions (subject: String, number: Int = 10) {
-        LoadingDialogController.show("面试准备中")
+        // LoadingDialogController.show("面试准备中")
         try {
             val response = sparkRepository.getQuestions(subject = subject, number = number)
             if (response.code == 200) {
@@ -92,7 +111,7 @@ class InterviewController @Inject constructor(
         } catch (e: Exception) {
             Log.e("init","questions init failed: $e")
         } finally {
-            LoadingDialogController.hide()
+            //LoadingDialogController.hide()
         }
     }
 
@@ -208,6 +227,35 @@ class InterviewController @Inject constructor(
         audioRecord?.stop()
         audioRecord?.release()
         audioRecord = null
+    }
+
+
+    fun playAudioAsync(audioData: ByteArray) {
+        viewModelScope.launch(Dispatchers.IO) {
+            playAudio(audioData)
+        }
+    }
+
+    fun playAudio(audioData: ByteArray) {
+        val sampleRate = 16000 // Hz
+        val channelConfig = AudioFormat.CHANNEL_OUT_MONO
+        val audioFormat = AudioFormat.ENCODING_PCM_16BIT
+
+        val minBufferSize = AudioTrack.getMinBufferSize(sampleRate, channelConfig, audioFormat)
+
+        val audioTrack = AudioTrack(
+            AudioManager.STREAM_MUSIC,
+            sampleRate,
+            channelConfig,
+            audioFormat,
+            minBufferSize,
+            AudioTrack.MODE_STREAM
+        )
+        // 播放
+        audioTrack.play()
+        audioTrack.write(audioData, 0, audioData.size)
+        audioTrack.stop()
+        audioTrack.release()
     }
 
 

@@ -58,6 +58,7 @@ dependencies {
     implementation(libs.androidx.camera.view)
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.firebase.crashlytics.buildtools)
     ksp("com.google.dagger:hilt-android-compiler:2.56.2")
     implementation("androidx.datastore:datastore-preferences:1.1.7")
     implementation(libs.retrofit)
