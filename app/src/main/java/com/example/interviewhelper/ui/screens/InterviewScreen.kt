@@ -169,7 +169,7 @@ fun InterviewScreen(
                     iconTint = Color.Red,
                     onClick = {
                         navController.popBackStack()
-                        Toast.makeText(context, "挂断", Toast.LENGTH_SHORT).show()
+                        navController.navigate("statictis")
                     },
                 )
             }

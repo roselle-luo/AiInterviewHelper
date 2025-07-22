@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">interviewHelper</string>
+
+    <string name="report">
+        # 📊 面试分析报告
+        ## 🧠 面试官综合评价
+</string>
 </resources>

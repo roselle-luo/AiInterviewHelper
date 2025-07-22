@@ -21,6 +21,9 @@ dependencyResolutionManagement {
         mavenCentral()
         maven(url = "https://jitpack.io")
         maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
+        flatDir {
+            dirs("libs/SparkChain.aar")   // 指定包含aar的目录
+        }
     }
 }
 

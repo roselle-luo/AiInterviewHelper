@@ -68,7 +68,7 @@ class InterviewController @Inject constructor(
 
         //SparkChainRepository.initAsr()
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             initQuestions(subject = subject, number= number)
 //            SparkChainRepository.wordFlow.collect {
 //                speechWordsList.add(it)
@@ -189,7 +189,7 @@ class InterviewController @Inject constructor(
                 if (read > 0) {
                     val audioData = buffer.copyOf(read)
                     Log.d("AudioSend", "发送音频数据，长度: ${audioData.size} 字节")
-                    // SparkChainRepository.start(audioData, count++)
+                    //SparkChainRepository.start(audioData, count++)
                     // websocket.sendAudioData(audioData)
                     Log.d("AudioSend", "发送音频数据，长度: ${audioData.size} 字节")
                 } else if (read == AudioRecord.ERROR_INVALID_OPERATION || read == AudioRecord.ERROR_BAD_VALUE) {
